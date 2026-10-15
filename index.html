@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixiv 月榜精选</title>
+<style>
+  :root { --bg: #141414; --card: #1f1f1f; --text: #f0f0f0; --muted: #9a9a9a; --accent: #0096fa; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; padding: 32px 20px 60px; }
+  header { max-width: 1100px; margin: 0 auto 28px; }
+  header h1 { font-size: 26px; margin-bottom: 6px; }
+  header p { color: var(--muted); font-size: 14px; }
+  .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card { background: var(--card); border-radius: 12px; overflow: hidden; text-decoration: none; color: inherit; transition: transform .15s ease; display: block; }
+  .card:hover { transform: translateY(-4px); }
+  .thumb { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #0d0d0d; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rank { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,.65); border-radius: 8px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
+  .rank.r1 { color: #ffd75e; } .rank.r2 { color: #d7d7d7; } .rank.r3 { color: #e0a173; }
+  .info { padding: 12px 14px 14px; }
+  .info h2 { font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info p { font-size: 13px; color: var(--muted); }
+  footer { max-width: 1100px; margin: 36px auto 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pixiv 月榜精选</h1>
+  <p id="period">加载中…</p>
+</header>
+<main class="grid" id="grid"></main>
+<footer>
+  图片为 Pixiv 月排行榜缩略图，著作权归原画师所有，仅作个人欣赏整理。<br>
+  数据来源：<a href="https://www.pixiv.net/ranking.php?mode=monthly" target="_blank" rel="noopener">Pixiv 月排行榜</a> ·
+  数据文件：<a href="data.json" target="_blank" rel="noopener">data.json</a>
+</footer>
+<script>
+fetch('data.json').then(r => r.json()).then(d => {
+  document.getElementById('period').textContent = '统计周期 ' + d.period + ' · 更新于 ' + d.updated;
+  document.title = 'Pixiv 月榜精选（' + d.period + '）';
+  const grid = document.getElementById('grid');
+  d.works.forEach(w => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = w.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.innerHTML =
+      '<div class="thumb"><img loading="lazy" src="' + w.image + '" alt="' + w.title + '">' +
+      '<span class="rank r' + w.rank + '">#' + w.rank + '</span></div>' +
+      '<div class="info"><h2>' + w.title + '</h2><p>' + w.artist + '</p></div>';
+    grid.appendChild(a);
+  });
+}).catch(() => {
+  document.getElementById('period').textContent = '数据加载失败';
+});
+</script>
+</body>
+</html>
